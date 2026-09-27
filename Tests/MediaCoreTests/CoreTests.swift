@@ -168,12 +168,13 @@ struct Workspace {
             try Data("converted".utf8).write(to: output)
             await meter.leave(job)
         }
+        let memoryBudget: UInt64 = 512 * 1_024 * 1_024
         let result = try await coordinator.run(source: w.source, destination: w.destination, options: .init(),
-            limits: .init(images: 3, videos: 1, memoryBytes: 512 * 1_024 * 1_024), onProgress: { _ in })
+            limits: .init(images: 3, videos: 1, memoryBytes: memoryBudget), onProgress: { _ in })
         #expect(result.converted == 12)
         #expect(await meter.peakImages == 3)
         #expect(await meter.peakVideos == 1)
-        #expect(await meter.peakMemory <= 512 * 1_024 * 1_024)
+        #expect(await meter.peakMemory <= memoryBudget)
     }
 
     @Test func activeCancellationRemovesTemporaryOutput() async throws {
