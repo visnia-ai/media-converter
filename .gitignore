@@ -1,0 +1,37 @@
+# macOS metadata
+.DS_Store
+._*
+
+# Swift and Xcode build outputs and local state
+.build/
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.swiftpm/
+*.app/
+*.dSYM/
+*.xcarchive/
+
+# Logs and local configuration
+*.log
+.env
+.env.*
+
+# Signing credentials
+*.p12
+*.p8
+*.pem
+*.key
+*.mobileprovision
+*.provisionprofile
+Local.xcconfig
+
+# Local test media and screenshots
+TestMedia/
+Screenshots/
+Sources/MediaCore/Resources/FFmpeg/ffmpeg
+Sources/MediaCore/Resources/FFmpeg/ffprobe
+
+# Packaged releases
+*.dmg

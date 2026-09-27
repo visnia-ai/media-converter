@@ -1,0 +1,20 @@
+Rebuilding the FFmpeg helpers
+============================
+The archive contains the exact unmodified FFmpeg source used for this release.
+The build-ffmpeg.sh script pins its version and SHA-256 and defines all configure
+flags. It builds arm64 and x86_64 helpers using Apple's macOS SDK, then combines
+them with lipo. Xcode 16.4 and macOS 15 were used for the published release.
+
+In a new directory on a Mac with Xcode installed:
+  mkdir -p Scripts Sources/MediaCore/Resources/FFmpeg build/ffmpeg/source
+  cp /path/to/ThirdPartySources/build-ffmpeg.sh Scripts/
+  cp /path/to/ThirdPartySources/{NOTICE,REBUILD}.txt Sources/MediaCore/Resources/FFmpeg/
+  cp /path/to/ThirdPartySources/ffmpeg-*.tar.xz build/ffmpeg/source/
+  bash Scripts/build-ffmpeg.sh
+
+The rebuilt executables appear in Sources/MediaCore/Resources/FFmpeg.
+The app source, helper entitlements, and embedding script are available in the
+matching tag at https://github.com/visnia-ai/media-converter.
+To use modified helpers, replace the copies in the app's Contents/Helpers and
+re-sign each with the supplied helper entitlements, then re-sign the app with
+its app entitlements. No Developer ID certificate is needed for ad-hoc signing.
