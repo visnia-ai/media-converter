@@ -7,6 +7,11 @@ BUILD_NUMBER="${2:?A positive build number is required}"
 [[ "$TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || { echo 'Invalid release tag' >&2; exit 1; }
 [[ "$BUILD_NUMBER" =~ ^[1-9][0-9]*$ ]] || { echo 'Invalid build number' >&2; exit 1; }
 VERSION="${TAG#v}"
+mkdir -p "$ROOT/build"
+TOOLS="$ROOT/build/dmg-tools"
+if [ ! -x "$TOOLS/bin/python" ]; then python3 -m venv "$TOOLS"; fi
+"$TOOLS/bin/python" -m pip install --disable-pip-version-check --only-binary=:all: \
+    --require-hashes -r "$ROOT/Scripts/dmg-requirements.txt"
 WORK="$(mktemp -d "$ROOT/build/package.XXXXXX")"
 MOUNT="$WORK/mount"
 cleanup() {
@@ -22,6 +27,8 @@ APP="$ROOT/build/ReleaseXcode/Build/Products/Release/Media Converter.app"
 PLIST="$APP/Contents/Info.plist"
 test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$PLIST")" = "$VERSION"
 test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$PLIST")" = "$BUILD_NUMBER"
+test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIconFile' "$PLIST")" = AppIcon
+test -s "$APP/Contents/Resources/AppIcon.icns"
 for BINARY in "$APP/Contents/MacOS/MediaConverter" "$APP/Contents/Helpers/ffmpeg" "$APP/Contents/Helpers/ffprobe"; do
     ARCHITECTURES="$(lipo -archs "$BINARY")"
     [[ " $ARCHITECTURES " == *" arm64 "* && " $ARCHITECTURES " == *" x86_64 "* ]]
@@ -48,13 +55,16 @@ ditto "$APP" "$WORK/stage/Media Converter.app"
 ln -s /Applications "$WORK/stage/Applications"
 cp LICENSE "$WORK/stage/LICENSE.txt"
 NAME="Media-Converter-$VERSION-universal"
-hdiutil create -quiet -volname "Media Converter $VERSION" -srcfolder "$WORK/stage" \
-    -format UDZO -ov "$ROOT/build/release/$NAME.dmg"
+"$TOOLS/bin/python" -m dmgbuild -s "$ROOT/Scripts/dmg-settings.py" \
+    -D "app=$WORK/stage/Media Converter.app" -D "license=$WORK/stage/LICENSE.txt" \
+    -D "icon=$ROOT/Configuration/AppIcon.icns" \
+    "Media Converter $VERSION" "$ROOT/build/release/$NAME.dmg"
 hdiutil verify "$ROOT/build/release/$NAME.dmg"
 mkdir -p "$MOUNT"
 hdiutil attach -quiet -readonly -nobrowse -mountpoint "$MOUNT" "$ROOT/build/release/$NAME.dmg"
 codesign --verify --deep --strict "$MOUNT/Media Converter.app"
 test "$(readlink "$MOUNT/Applications")" = /Applications
+"$TOOLS/bin/python" "$ROOT/Scripts/verify-dmg-layout.py" "$MOUNT"
 hdiutil detach -quiet "$MOUNT"
 # Include the unmodified, checksum-verified dependency source and full build recipe.
 test -n "$(find build/ThirdPartySources -name 'ffmpeg-*.tar.xz' -print -quit)"

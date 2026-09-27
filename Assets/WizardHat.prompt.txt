@@ -1,0 +1,6 @@
+Generated with the built-in image generation tool, with transparent_background=true.
+
+Use case: logo-brand. Create one polished, stylized wizard hat logo for a macOS media-converter app. A distinctive curved pointed wizard hat with a broad sweeping brim, simplified elegant shapes and a clear recognizable silhouette. Modern minimal dimensional icon treatment, softly modeled smooth surfaces, restrained magical detail such as a single small star on the hat. Centered square composition with generous transparent padding, fully visible hat, strong legibility at small app-icon sizes. No words, letters, watermark, extra objects, or enclosing app-icon tile. Transparent background. Deliver a single finished logo, not a contact sheet.
+
+Revision: Edit this existing wizard hat logo for its macOS app icon. Change only the transparent background to solid pure white (#FFFFFF), fully opaque edge-to-edge square canvas. Preserve the exact blue and purple wizard hat, gold star, silhouette, shading, size, position, and padding. No gray gradient, no tile border, no new shadows, no text. The background must be flat white.
+Built-in image generation edit, transparent_background=false.
